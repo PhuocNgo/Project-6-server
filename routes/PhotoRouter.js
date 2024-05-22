@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     cb(null, "images");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`);
   },
 });
 
@@ -39,24 +39,17 @@ router.post("/commentsOfPhoto/:photo_id", async (request, response) => {
   }
 });
 
-router.post("/new", upload.single("file"), async (request, response) => {
+router.post("/new", upload.single("image"), async (req, res) => {
   try {
-    const user = request.user;
-    const title = request.body.title;
-    const imagePath = request.file.path;
-    const photoSaved = await Photo.create({
-      title: title,
-      url: imagePath,
+    const { user_id } = req.body;
+    const photo = new Photo({
       file_name: req.file.filename,
-      user_id: user._id,
-      comments: [],
+      user_id,
     });
-    response.status(200).send({
-      message: "upload success",
-      data: photoSaved,
-    });
-  } catch (err) {
-    response.status(500).send({ message: "error" });
+    await photo.save();
+    res.status(201).json(photo);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 });
 

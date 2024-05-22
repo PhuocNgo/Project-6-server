@@ -32,6 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use("/api/user", UserRouter);
 app.use("/api/photo", PhotoRouter);
 app.use("/api/authorization", AuthenRouter);
